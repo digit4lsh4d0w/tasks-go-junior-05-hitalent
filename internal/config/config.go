@@ -8,35 +8,23 @@ import (
 )
 
 type Config struct {
-	LogConfig LogConfig      `yaml:"log"`
-	DBConfig  DatabaseConfig `yaml:"database"`
+	DBConfig  DBConfig  `yaml:"database"`
+	LogConfig LogConfig `yaml:"log"`
 }
 
-type LogConfig struct {
-	// Variants:
-	//  - "debug"
-	//  - "info"
-	//  - "warning"
-	//  - "error"
-	Level string `yaml:"level"`
+func (c *Config) Validate() error {
+	validators := []interface{ Validate() error }{
+		&c.DBConfig,
+		&c.LogConfig,
+	}
 
-	// Variants:
-	//  - "stdout"
-	//  - "file"
-	//  - "both"
-	Output string `yaml:"output"`
+	for _, v := range validators {
+		if err := v.Validate(); err != nil {
+			return fmt.Errorf("%w: %w", ErrConfigValidation, err)
+		}
+	}
 
-	// Variants:
-	//  - "text"
-	//  - "json"
-	Format    string `yaml:"format"`
-	Path      string `yaml:"path"`
-	AddSource bool   `yaml:"add_source"`
-}
-
-type DatabaseConfig struct {
-	Driver string `yaml:"driver"`
-	DSN    string `yaml:"dsn"`
+	return nil
 }
 
 func Load(path string) (*Config, error) {
@@ -51,6 +39,10 @@ func Load(path string) (*Config, error) {
 	var cfg Config
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		return nil, &ConfigError{Op: "parse", Path: path, Err: err}
+	}
+
+	if err := cfg.Validate(); err != nil {
+		return nil, &ConfigError{Op: "validate", Path: path, Err: err}
 	}
 
 	return &cfg, nil
