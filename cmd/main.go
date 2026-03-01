@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"task-5/internal/config"
-	"task-5/internal/database"
+	"task-5/internal/db"
 	"task-5/internal/handler"
-	"task-5/internal/logger/slog"
+	"task-5/internal/log/slog"
+	"task-5/internal/middleware"
 	"task-5/internal/repository/gorm"
 	"task-5/internal/service"
 )
@@ -22,29 +22,33 @@ func main() {
 	// TODO: Remove in production
 	fmt.Printf("%#v\n", cfg)
 
-	logger, err := slog.New(&cfg.LogConfig)
+	log, err := slog.New(&cfg.LogConfig)
 	if err != nil {
 		panic(err)
 	}
-	defer logger.Close()
+	defer log.Close()
 
-	logger.Info("Starting...")
+	log.Info("Starting...")
 
-	logger.Debug("Initializing database...")
-	db, err := database.NewDatabase(cfg.DBConfig)
+	log.Debug("Initializing database...")
+	db, err := db.NewDatabase(cfg.DBConfig)
 	if err != nil {
-		logger.Error("Failed to initialize database", "error", err)
+		log.Error("Failed to initialize database", "error", err)
 		panic(err)
 	}
 
-	chatRepo := gorm.NewChatRepositoryGorm(db)
+	chatRepo := gorm.NewChatRepository(db, log)
+	// msgRepo := gorm.NewChatRepository(db, logger)
 	chatService := service.NewChatService(chatRepo)
 	chatHandler := handler.NewChatHandler(chatService)
 
-	http.HandleFunc("POST /chat/", chatHandler.CreateChat)
-	http.HandleFunc("POST /chat/{chat_id}/message/", chatHandler.SendMsg)
-	http.HandleFunc("GET /chat/{chat_id}/", chatHandler.GetMsgs)
-	http.HandleFunc("DELETE /chat/{chat_id}/", chatHandler.DeleteChat)
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /chat/", chatHandler.CreateChat)
+	mux.HandleFunc("POST /chat/{chat_id}/message/", chatHandler.SendMsg)
+	mux.HandleFunc("GET /chat/{chat_id}/", chatHandler.GetMsgs)
+	mux.HandleFunc("DELETE /chat/{chat_id}/", chatHandler.DeleteChat)
 
-	log.Fatal(http.ListenAndServe(":3000", nil))
+	handler := middleware.Chain(mux, middleware.Log(log))
+
+	log.Error("Server stopped", "error", http.ListenAndServe(":3000", handler))
 }
