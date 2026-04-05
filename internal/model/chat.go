@@ -1,9 +1,10 @@
 package model
 
-import "gorm.io/gorm"
+import "time"
 
 type Chat struct {
-	gorm.Model
-	Title    string    `validate:"required,min=1,max=200"`
-	Messages []Message `gorm:"foreignKey:ChatID;constraint:OnDelete:CASCADE"`
+	ID        uint
+	Title     string
+	Messages  []Message
+	CreatedAt time.Time
 }
