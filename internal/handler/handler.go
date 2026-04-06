@@ -19,9 +19,10 @@ const (
 )
 
 type ChatService interface {
-	GetChat(id uint, limit int) (*model.Chat, error)
 	CreateChat(chat *model.Chat) error
+	GetChatWithMessages(id uint, limit int) (*model.Chat, error)
 	DeleteChat(id uint) error
+	CreateMessage(msg *model.Message) error
 }
 
 type chatHandler struct {
@@ -43,6 +44,7 @@ type CreateChatRequest struct {
 }
 
 func (h *chatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
+	// Ограничение тела запроса до 1 МебиБайта
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 	defer r.Body.Close()
 
@@ -67,6 +69,12 @@ func (h *chatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.respondJSON(w, http.StatusCreated, chat)
+}
+
+func (h *chatHandler) DeleteChat(w http.ResponseWriter, r *http.Request) {}
+
+type SendMessageRequest struct {
+	Text string `json:"text", validate:"required,min=1,max=5000"`
 }
 
 func (h *chatHandler) SendMsg(w http.ResponseWriter, r *http.Request) {}
@@ -103,7 +111,7 @@ func (h *chatHandler) GetMsgs(w http.ResponseWriter, r *http.Request) {
 
 	limit := parseLimit(r)
 
-	chat, err := h.service.GetChat(uint(id), limit)
+	chat, err := h.service.GetChatWithMessages(uint(id), limit)
 	if err != nil {
 		// TODO: Исправить протечку абстракции
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -116,5 +124,3 @@ func (h *chatHandler) GetMsgs(w http.ResponseWriter, r *http.Request) {
 
 	h.respondJSON(w, http.StatusOK, chat)
 }
-
-func (h *chatHandler) DeleteChat(w http.ResponseWriter, r *http.Request) {}
