@@ -51,6 +51,16 @@ func NewMessageRepository(db *gorm.DB, logger log.Logger) *messageRepository {
 	return &messageRepository{db, logger}
 }
 
+func (r *messageRepository) Create(msg *model.Message) error {
+	dao := toDAOMessage(msg)
+	err := r.db.Create(&dao).Error
+	if err == nil {
+		msg.ID = dao.ID
+		msg.CreatedAt = dao.CreatedAt
+	}
+	return err
+}
+
 func (r *messageRepository) FindAll() ([]model.Message, error) {
 	var daoMsgs []gormMessage
 	result := r.db.Find(&daoMsgs)
@@ -71,16 +81,6 @@ func (r *messageRepository) FindByID(id uint) (*model.Message, error) {
 		return nil, result.Error
 	}
 	return toModelMessage(&m), nil
-}
-
-func (r *messageRepository) Create(msg *model.Message) error {
-	dao := toDAOMessage(msg)
-	err := r.db.Create(&dao).Error
-	if err == nil {
-		msg.ID = dao.ID
-		msg.CreatedAt = dao.CreatedAt
-	}
-	return err
 }
 
 func (r *messageRepository) Update(msg *model.Message) error {

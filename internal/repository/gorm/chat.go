@@ -59,6 +59,16 @@ func NewChatRepository(db *gorm.DB, log log.Logger) *chatRepository {
 	return &chatRepository{db, log}
 }
 
+func (r *chatRepository) Create(chat *model.Chat) error {
+	dao := toDAOChat(chat)
+	err := r.db.Create(dao).Error
+	if err == nil {
+		chat.ID = dao.ID
+		chat.CreatedAt = dao.CreatedAt
+	}
+	return err
+}
+
 func (r *chatRepository) FindAll() ([]model.Chat, error) {
 	var daoChats []gormChat
 	result := r.db.Find(&daoChats)
@@ -84,16 +94,6 @@ func (r *chatRepository) FindByIDWithMessages(id uint, limit int) (*model.Chat, 
 		return nil, result.Error
 	}
 	return toModelChat(&c), nil
-}
-
-func (r *chatRepository) Create(chat *model.Chat) error {
-	dao := toDAOChat(chat)
-	err := r.db.Create(dao).Error
-	if err == nil {
-		chat.ID = dao.ID
-		chat.CreatedAt = dao.CreatedAt
-	}
-	return err
 }
 
 func (r *chatRepository) Update(chat *model.Chat) error {
