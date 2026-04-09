@@ -114,6 +114,10 @@ func (h *chatHandler) DeleteChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = h.service.DeleteChat(chatID); err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			h.respondError(w, http.StatusNotFound, "chat not found")
+			return
+		}
 		h.respondError(w, http.StatusInternalServerError, "failed to delete chat")
 		return
 	}
