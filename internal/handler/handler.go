@@ -129,7 +129,7 @@ func (h *chatHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.service.GetChat(uint(chatID))
+	_, err = h.service.GetChat(chatID)
 	if err != nil {
 		h.respondError(w, http.StatusNotFound, "chat not found")
 		return
@@ -151,7 +151,7 @@ func (h *chatHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	message := &model.Message{
-		ChatID: uint(chatID),
+		ChatID: chatID,
 		Text:   req.Text,
 	}
 
@@ -172,7 +172,7 @@ func (h *chatHandler) GetAllMessages(w http.ResponseWriter, r *http.Request) {
 
 	limit := parseLimit(r)
 
-	chat, err := h.service.GetChatWithMessages(uint(chatID), limit)
+	chat, err := h.service.GetChatWithMessages(chatID, limit)
 	if err != nil {
 		// TODO: Исправить протечку абстракции
 		if errors.Is(err, gorm.ErrRecordNotFound) {
