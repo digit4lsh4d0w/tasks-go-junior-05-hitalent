@@ -1,0 +1,15 @@
+type: workspace
+model: workspace
+id: wk_iE2YPfpxwP
+createdAt: 2026-04-10T04:14:17.729502161
+updatedAt: 2026-04-10T04:14:17.729502841
+authentication: {}
+authenticationType: null
+description: ''
+headers: []
+name: tasks-go-05-junior-hitalent
+encryptionKeyChallenge: null
+settingValidateCertificates: true
+settingFollowRedirects: true
+settingRequestTimeout: 0
+settingDnsOverrides: []

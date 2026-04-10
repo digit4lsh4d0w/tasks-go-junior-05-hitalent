@@ -1,0 +1,26 @@
+type: http_request
+model: http_request
+id: rq_5wg6rcVQSK
+createdAt: 2026-04-10T04:16:39.881684698
+updatedAt: 2026-04-10T07:51:18.071959568
+workspaceId: wk_iE2YPfpxwP
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "text": "test"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: vvkRjKwpUu
+method: POST
+name: Create Message
+sortPriority: 1000.0
+url: http://localhost:3000/chat/1/message/
+urlParameters: []

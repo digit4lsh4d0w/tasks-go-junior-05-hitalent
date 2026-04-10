@@ -1,0 +1,26 @@
+type: http_request
+model: http_request
+id: rq_ybfxrJX4fy
+createdAt: 2026-04-10T04:14:24.892457949
+updatedAt: 2026-04-10T06:12:44.849876015
+workspaceId: wk_iE2YPfpxwP
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "title": "test"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: A287chDY2k
+method: POST
+name: Create Chat
+sortPriority: 0.0
+url: http://localhost:3000/chat/
+urlParameters: []
