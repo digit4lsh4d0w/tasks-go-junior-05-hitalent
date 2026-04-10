@@ -1,15 +1,17 @@
 package gorm
 
 import (
-	"task-5/internal/model"
+	"time"
 
-	"gorm.io/gorm"
+	"task-5/internal/model"
 )
 
 type gormChat struct {
-	gorm.Model
-	Title    string        `gorm:"not null;unique"`
-	Messages []gormMessage `gorm:"foreignKey:ChatID;constraint:OnDelete:CASCADE"`
+	ID        uint   `gorm:"primaryKey"`
+	Title     string `gorm:"not null;unique"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Messages  []gormMessage `gorm:"foreignKey:ChatID;constraint:OnDelete:CASCADE"`
 }
 
 func (gormChat) TableName() string {
@@ -49,9 +51,11 @@ func toDAOChat(m *model.Chat) *gormChat {
 }
 
 type gormMessage struct {
-	gorm.Model
-	ChatID uint   `gorm:"not null;index"`
-	Text   string `gorm:"not null"`
+	ID        uint   `gorm:"primaryKey"`
+	ChatID    uint   `gorm:"not null;index"`
+	Text      string `gorm:"not null"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func (gormMessage) TableName() string {
