@@ -85,11 +85,13 @@ func (h *chatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
 
 	var req CreateChatRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		h.log.Warn("failed to decode json body", "error", err)
 		h.respondError(w, http.StatusBadRequest, "invalid json body")
 		return
 	}
 
 	if err := h.validator.Struct(req); err != nil {
+		h.log.Warn("failed to validate request", "error", err)
 		h.respondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -99,6 +101,7 @@ func (h *chatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.service.CreateChat(chat); err != nil {
+		h.log.Error("failed to create chat", "error", err)
 		h.respondError(w, http.StatusInternalServerError, "failed to create chat")
 		return
 	}
@@ -109,15 +112,19 @@ func (h *chatHandler) CreateChat(w http.ResponseWriter, r *http.Request) {
 func (h *chatHandler) DeleteChat(w http.ResponseWriter, r *http.Request) {
 	chatID, err := parseChatID(r)
 	if err != nil {
+		h.log.Warn("failed to parse chat id", "error", err)
 		h.respondError(w, http.StatusBadRequest, "invalid chat id")
 		return
 	}
 
 	if err = h.service.DeleteChat(chatID); err != nil {
 		if errors.Is(err, model.ErrNotFound) {
+			h.log.Warn("chat not found", "error", err, "chat_id", chatID)
 			h.respondError(w, http.StatusNotFound, "chat not found")
 			return
 		}
+
+		h.log.Error("failed to delete chat", "error", err, "chat_id", chatID)
 		h.respondError(w, http.StatusInternalServerError, "failed to delete chat")
 		return
 	}
@@ -128,6 +135,7 @@ func (h *chatHandler) DeleteChat(w http.ResponseWriter, r *http.Request) {
 func (h *chatHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 	chatID, err := parseChatID(r)
 	if err != nil {
+		h.log.Warn("failed to parse chat id", "error", err)
 		h.respondError(w, http.StatusBadRequest, "invalid chat id")
 		return
 	}
@@ -157,11 +165,13 @@ func (h *chatHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 
 	var req SendMessageRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		h.log.Warn("failed to decode json body", "error", err)
 		h.respondError(w, http.StatusBadRequest, "invalid json body")
 		return
 	}
 
 	if err := h.validator.Struct(req); err != nil {
+		h.log.Warn("invalid request body", "error", err)
 		h.respondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -172,6 +182,7 @@ func (h *chatHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.service.CreateMessage(message); err != nil {
+		h.log.Error("failed to create message", "error", err)
 		h.respondError(w, http.StatusInternalServerError, "failed to create message")
 		return
 	}
@@ -182,6 +193,7 @@ func (h *chatHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 func (h *chatHandler) GetAllMessages(w http.ResponseWriter, r *http.Request) {
 	chatID, err := parseChatID(r)
 	if err != nil {
+		h.log.Warn("failed to parse chat id", "error", err)
 		h.respondError(w, http.StatusBadRequest, "invalid chat id")
 		return
 	}
@@ -191,9 +203,12 @@ func (h *chatHandler) GetAllMessages(w http.ResponseWriter, r *http.Request) {
 	chat, err := h.service.GetChatWithMessages(chatID, limit)
 	if err != nil {
 		if errors.Is(err, model.ErrNotFound) {
-			h.respondError(w, http.StatusNotFound, "not found")
+			h.log.Warn("chat not found", "error", err, "chat_id", chatID)
+			h.respondError(w, http.StatusNotFound, "chat not found")
 			return
 		}
+
+		h.log.Error("failed to get chat with messages", "error", err, "chat_id", chatID)
 		h.respondError(w, http.StatusInternalServerError, "internal error")
 		return
 	}
