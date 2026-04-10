@@ -122,7 +122,7 @@ func (h *chatHandler) DeleteChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.respondSuccess(w, http.StatusNoContent, "chat deleted successfully")
+	h.respondSuccess(w, http.StatusOK, "chat deleted successfully")
 }
 
 func (h *chatHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
