@@ -140,26 +140,6 @@ func (h *chatHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Рассмотреть вариант удаления данной проверки в силу
-	// гарантий СУБД и внешних ключей в таблице messages.
-	//
-	// Тип ошибки: TOCTOU (Time-of-Check to Time-of-Use)
-	//
-	// === Пояснение
-	// Данный код вызывает состояние гонки, т.к. между проверкой существования
-	// чата и созданием сообщения может произойти событие удаления чата, что
-	// является состоянием гонки данных.
-	//
-	// При этом если при создании таблицы messages с полем chat_id указать,
-	// что поле является внешним ключом к таблице chats, то СУБД будет
-	// предоставлять гарантии существования чата при создании сообщения.
-	// _, err = h.service.GetChat(chatID)
-	// if err != nil {
-	// 	h.log.Warn("chat not found", "error", err, "chat_id", chatID)
-	// 	h.respondError(w, http.StatusNotFound, "chat not found")
-	// 	return
-	// }
-
 	// Ограничение тела запроса до 2 МебиБайт
 	r.Body = http.MaxBytesReader(w, r.Body, 2*1<<20)
 	defer r.Body.Close()
