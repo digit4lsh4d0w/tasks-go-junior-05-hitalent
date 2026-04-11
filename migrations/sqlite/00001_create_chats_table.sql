@@ -6,7 +6,5 @@ CREATE TABLE chats (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_chats_deleted_at ON chats(deleted_at);
-
 -- +goose Down
 DROP TABLE IF EXISTS chats;

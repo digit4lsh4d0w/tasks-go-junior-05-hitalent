@@ -9,7 +9,6 @@ CREATE TABLE messages (
 );
 
 CREATE INDEX idx_messages_chat_id ON messages(chat_id);
-CREATE INDEX idx_messages_deleted_at ON messages(deleted_at);
 CREATE INDEX idx_messages_chat_created ON messages(chat_id, created_at DESC);
 
 -- +goose Down
