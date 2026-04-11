@@ -5,10 +5,10 @@ import (
 )
 
 type ChatRepository interface {
+	Create(chat *model.Chat) error
 	FindAll() ([]model.Chat, error)
 	FindByID(id uint) (*model.Chat, error)
 	FindByIDWithMessages(id uint, limit int) (*model.Chat, error)
-	Create(chat *model.Chat) error
 	Delete(id uint) error
 	CreateMessage(msg *model.Message) error
 }
