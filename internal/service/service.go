@@ -1,8 +1,6 @@
 package service
 
 import (
-	"errors"
-
 	"task-5/internal/model"
 )
 
@@ -24,9 +22,6 @@ func NewChatService(chatRepo ChatRepository) *chatService {
 }
 
 func (s *chatService) CreateChat(chat *model.Chat) error {
-	if chat.Title == "" {
-		return errors.New("chat title is required")
-	}
 	return s.chatRepo.Create(chat)
 }
 
