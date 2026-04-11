@@ -27,13 +27,12 @@ func toModelChat(c *gormChat) *model.Chat {
 		ID:        c.ID,
 		Title:     c.Title,
 		CreatedAt: c.CreatedAt,
+		UpdatedAt: c.UpdatedAt,
 	}
 
-	if len(c.Messages) > 0 {
-		chat.Messages = make([]model.Message, len(c.Messages))
-		for i, m := range c.Messages {
-			chat.Messages[i] = *toModelMessage(&m)
-		}
+	chat.Messages = make([]model.Message, len(c.Messages))
+	for i, m := range c.Messages {
+		chat.Messages[i] = *toModelMessage(&m)
 	}
 
 	return chat
@@ -43,11 +42,12 @@ func toDAOChat(m *model.Chat) *gormChat {
 	if m == nil {
 		return nil
 	}
-	c := &gormChat{}
-	c.ID = m.ID
-	c.Title = m.Title
-	c.CreatedAt = m.CreatedAt
-	return c
+	return &gormChat{
+		ID:        m.ID,
+		Title:     m.Title,
+		CreatedAt: m.CreatedAt,
+		UpdatedAt: m.UpdatedAt,
+	}
 }
 
 type gormMessage struct {
@@ -78,10 +78,11 @@ func toDAOMessage(m *model.Message) *gormMessage {
 	if m == nil {
 		return nil
 	}
-	msg := &gormMessage{}
-	msg.ID = m.ID
-	msg.ChatID = m.ChatID
-	msg.Text = m.Text
-	msg.CreatedAt = m.CreatedAt
-	return msg
+	return &gormMessage{
+		ID:        m.ID,
+		ChatID:    m.ChatID,
+		Text:      m.Text,
+		CreatedAt: m.CreatedAt,
+		UpdatedAt: m.UpdatedAt,
+	}
 }

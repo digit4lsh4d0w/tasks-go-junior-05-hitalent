@@ -22,10 +22,17 @@ func NewChatRepository(db *gorm.DB, log log.Logger) *chatRepository {
 func (r *chatRepository) Create(chat *model.Chat) error {
 	dao := toDAOChat(chat)
 	err := r.db.Create(dao).Error
-	if err == nil {
-		chat.ID = dao.ID
-		chat.CreatedAt = dao.CreatedAt
+	if err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return model.ErrAlreadyExists
+		}
+		return err
 	}
+
+	chat.ID = dao.ID
+	chat.CreatedAt = dao.CreatedAt
+	chat.UpdatedAt = dao.UpdatedAt
+
 	return err
 }
 
@@ -95,6 +102,7 @@ func (r *chatRepository) CreateMessage(msg *model.Message) error {
 
 	msg.ID = dao.ID
 	msg.CreatedAt = dao.CreatedAt
+	msg.UpdatedAt = dao.UpdatedAt
 
 	return nil
 }
