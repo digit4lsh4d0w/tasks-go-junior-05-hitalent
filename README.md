@@ -6,4 +6,3 @@
 - [Дневник разработки]
 
 [Описание задачи]: docs/description.md
-[Дневник разработки]: docs/dev-journal.md
