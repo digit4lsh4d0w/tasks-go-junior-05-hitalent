@@ -6,17 +6,23 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func NewDatabase(cfg config.DBConfig) (*gorm.DB, error) {
 	var db *gorm.DB
 	var err error
 
+	gormConfig := &gorm.Config{
+		TranslateError: true,
+		Logger:         logger.Default.LogMode(logger.Silent),
+	}
+
 	switch cfg.Driver {
 	case "postgres":
-		db, err = gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{TranslateError: true})
+		db, err = gorm.Open(postgres.Open(cfg.DSN), gormConfig)
 	case "sqlite":
-		db, err = gorm.Open(sqlite.Open(cfg.DSN), &gorm.Config{TranslateError: true})
+		db, err = gorm.Open(sqlite.Open(cfg.DSN), gormConfig)
 	default:
 		return nil, &DatabaseError{DSN: cfg.DSN, Err: gorm.ErrUnsupportedDriver}
 	}
