@@ -1,3 +1,6 @@
+server:
+  endpoint: ":3000"
+
 database:
   driver: "sqlite"
   # dsn: ":memory:"

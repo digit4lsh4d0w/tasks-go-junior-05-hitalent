@@ -9,6 +9,7 @@ import (
 )
 
 type Config struct {
+	Endpoint  string    `yaml:"endpoint"`
 	DBConfig  DBConfig  `yaml:"database"`
 	LogConfig LogConfig `yaml:"log"`
 }
@@ -36,6 +37,7 @@ func (c *Config) Validate() error {
 
 func defaultConfig() Config {
 	return Config{
+		Endpoint: ":3000",
 		DBConfig: DBConfig{
 			Driver: "sqlite",
 			DSN:    ":memory:",
